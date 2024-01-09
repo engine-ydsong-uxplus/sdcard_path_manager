@@ -1,7 +1,6 @@
 package kr.co.crowsoft.sdcard_path_manager.sdcard_path_manager
 
 
-
 import android.content.Context
 import android.os.Build
 import android.os.Environment
@@ -23,7 +22,7 @@ object Storage {
     }
 
 
-    fun mkdirMemoryPath(context: Context, dirName : String): Boolean {
+    fun mkdirMemoryPath(context: Context, dirName: String): Boolean {
         val path = "${getMemoryPath(context)}/$dirName"
         Log.d(TAG, "mkdir path : $path")
         val file = File(path)
@@ -35,7 +34,7 @@ object Storage {
     }
 
 
-    fun mkdirSDCardMemoryPath(context: Context, dirName : String) : Boolean {
+    fun mkdirSDCardMemoryPath(context: Context, dirName: String): Boolean {
         val path = "${getSDCardMemoryPath(context)}/$dirName"
         Log.d(TAG, "mkdir path : $path")
         val file = File(path)
@@ -64,17 +63,22 @@ object Storage {
     fun getAvailableSDCardMemorySize(context: Context): Long {
         if (isExternalMemoryAvailable()) {
             val path = File(getSDCardMemoryPath(context))
-            val stat = StatFs(path.path)
-            val blockSize: Long
-            val availableBlocks: Long
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                blockSize = stat.blockSizeLong
-                availableBlocks = stat.availableBlocksLong
-            } else {
-                blockSize = stat.blockSize.toLong()
-                availableBlocks = stat.availableBlocks.toLong()
+            return try {
+                val stat = StatFs(path.path)
+                val blockSize: Long
+                val availableBlocks: Long
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                    blockSize = stat.blockSizeLong
+                    availableBlocks = stat.availableBlocksLong
+                } else {
+                    blockSize = stat.blockSize.toLong()
+                    availableBlocks = stat.availableBlocks.toLong()
+                }
+                blockSize * availableBlocks
+            } catch (e: Exception) {
+                0
             }
-            return blockSize * availableBlocks
+
         }
         return -1
     }
@@ -82,7 +86,7 @@ object Storage {
 
     fun getMemoryPath(context: Context, dirName: String? = null): String {
         val externalStorageVolumes: Array<out File> =
-            ContextCompat.getExternalFilesDirs(context.applicationContext, null)
+                ContextCompat.getExternalFilesDirs(context.applicationContext, null)
         var path = externalStorageVolumes[0].path
 
         dirName?.let {
@@ -94,7 +98,7 @@ object Storage {
 
     fun getAvailableMemorySize(context: Context): Long {
         val externalStorageVolumes: Array<out File> =
-            ContextCompat.getExternalFilesDirs(context.applicationContext, null)
+                ContextCompat.getExternalFilesDirs(context.applicationContext, null)
         //val primaryExternalStorage = externalStorageVolumes[0]
 
         if (isExternalMemoryAvailable()) {
@@ -119,8 +123,6 @@ object Storage {
     private fun isExternalMemoryAvailable(): Boolean {
         return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
     }
-
-
 
 
     private fun getExternalSdCardPath(context: Context): String {

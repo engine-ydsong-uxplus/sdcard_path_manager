@@ -1,6 +1,6 @@
 name: sdcard_path_manager
 description: Get the path and size of SD from Android.
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/azeek/sdcard_path_manager
 
 environment:
